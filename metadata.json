@@ -1,0 +1,7 @@
+{
+  "name": "My Finance Manager",
+  "description": "Offline personal finance tracker with fast-tap expense logging, P2P borrow & lending asset/liability tracking, credit card pool limits, real-time bank balances, Google Drive private sync, and multi-year spending analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
