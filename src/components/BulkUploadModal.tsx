@@ -19,6 +19,8 @@ import {
 import {
   INITIAL_INVESTMENT_SNAPSHOTS,
   INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS,
+  ZERO_INVESTMENT_SNAPSHOTS,
+  ZERO_EXPENSE_SNAPSHOTS,
 } from '../data/historicalData';
 import { formatINR } from '../utils/formatters';
 
@@ -245,6 +247,13 @@ Dec-24,20053,457892,67982,154890,0,170331,5070,10566`;
     setTimeout(() => onClose(), 1500);
   };
 
+  const handleResetChartsToZero = () => {
+    onUpdateHistoricalInvestments(ZERO_INVESTMENT_SNAPSHOTS);
+    onUpdateHistoricalExpenses(ZERO_EXPENSE_SNAPSHOTS);
+    setSuccessMessage('Successfully reset all 3 long-term charts to ₹0.00!');
+    setTimeout(() => onClose(), 1500);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4">
       <div className="w-full max-w-2xl rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl p-6 text-slate-100 flex flex-col max-h-[92vh] overflow-hidden">
@@ -267,22 +276,30 @@ Dec-24,20053,457892,67982,154890,0,170331,5070,10566`;
         {/* Content */}
         <div className="py-4 space-y-4 overflow-y-auto flex-1">
           {/* 1-Click Load Excel Screenshots Data Banner */}
-          <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/40 border border-emerald-500/30 rounded-2xl p-4 flex items-center justify-between gap-3">
+          <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/40 border border-emerald-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <h4 className="font-bold text-xs text-emerald-300 flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
                 Preload Data From Your Screenshots
               </h4>
               <p className="text-[11px] text-slate-300 mt-0.5">
-                Load the complete historical records from your 3 Excel sheet screenshots (Dec-23 through Nov-25).
+                Load the complete historical records from your 3 Excel sheet screenshots (Dec-23 through Nov-25), or reset charts to ₹0.00.
               </p>
             </div>
-            <button
-              onClick={handleLoadFullExcelScreenshotsData}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 shadow-md transition active:scale-95"
-            >
-              Load Screenshot Data
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleResetChartsToZero}
+                className="px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-bold text-xs transition cursor-pointer active:scale-95"
+              >
+                Reset to ₹0
+              </button>
+              <button
+                onClick={handleLoadFullExcelScreenshotsData}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition cursor-pointer active:scale-95"
+              >
+                Load Screenshot Data
+              </button>
+            </div>
           </div>
 
           {/* Import Mode Selector */}

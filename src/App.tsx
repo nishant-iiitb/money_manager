@@ -24,6 +24,10 @@ import {
   saveHistoricalInvestments,
   loadHistoricalExpenses,
   saveHistoricalExpenses,
+  INITIAL_INVESTMENT_SNAPSHOTS,
+  INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS,
+  ZERO_INVESTMENT_SNAPSHOTS,
+  ZERO_EXPENSE_SNAPSHOTS,
 } from './data/historicalData';
 import {
   Sparkles,
@@ -67,6 +71,22 @@ export default function App() {
     }
   };
 
+  const handleResetToZero = () => {
+    store.resetToZero();
+    setHistoricalInvestments(ZERO_INVESTMENT_SNAPSHOTS);
+    setHistoricalExpenses(ZERO_EXPENSE_SNAPSHOTS);
+    saveHistoricalInvestments(ZERO_INVESTMENT_SNAPSHOTS);
+    saveHistoricalExpenses(ZERO_EXPENSE_SNAPSHOTS);
+  };
+
+  const handleLoadDemoData = () => {
+    store.loadDemoData();
+    setHistoricalInvestments(INITIAL_INVESTMENT_SNAPSHOTS);
+    setHistoricalExpenses(INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS);
+    saveHistoricalInvestments(INITIAL_INVESTMENT_SNAPSHOTS);
+    saveHistoricalExpenses(INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS);
+  };
+
   const navItems: { id: ActiveTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'quick-add', label: 'Quick Tap', icon: Plus },
     { id: 'expenses', label: 'Expenses', icon: ReceiptText },
@@ -85,8 +105,8 @@ export default function App() {
         totalLiabilities={store.calculatedCardsAndPools.totalLiabilities}
         data={store.data}
         onImportData={store.importData}
-        onResetToZero={store.resetToZero}
-        onLoadDemoData={store.loadDemoData}
+        onResetToZero={handleResetToZero}
+        onLoadDemoData={handleLoadDemoData}
         onOpenCategoriesModal={() => setIsCategoriesModalOpen(true)}
         onOpenAIInsights={() => setIsAIModalOpen(true)}
         onOpenGoogleDriveSync={() => setIsDriveModalOpen(true)}
@@ -281,6 +301,8 @@ export default function App() {
             historicalInvestments={historicalInvestments}
             historicalExpenses={historicalExpenses}
             onOpenBulkUpload={() => setIsBulkUploadOpen(true)}
+            onResetToZero={handleResetToZero}
+            onLoadDemoData={handleLoadDemoData}
           />
         )}
       </main>

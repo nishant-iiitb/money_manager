@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   PieChart,
   BarChart3,
@@ -12,6 +12,8 @@ import {
   ArrowUpRight,
   Upload,
   Sparkles,
+  RotateCcw,
+  Trash2,
 } from 'lucide-react';
 import { Transaction, CustomCategory } from '../types/finance';
 import {
@@ -41,6 +43,8 @@ interface AnalyticsChartsViewProps {
   historicalInvestments: MonthlyInvestmentSnapshot[];
   historicalExpenses: MonthlyExpenseVsInvestmentSnapshot[];
   onOpenBulkUpload: () => void;
+  onResetToZero?: () => void;
+  onLoadDemoData?: () => void;
 }
 
 export const AnalyticsChartsView: React.FC<AnalyticsChartsViewProps> = ({
@@ -54,8 +58,11 @@ export const AnalyticsChartsView: React.FC<AnalyticsChartsViewProps> = ({
   historicalInvestments,
   historicalExpenses,
   onOpenBulkUpload,
+  onResetToZero,
+  onLoadDemoData,
 }) => {
-  const [viewMode, setViewMode] = useState<'historical_charts' | 'current_month'>('historical_charts');
+  const [viewMode, setViewMode] = useState<'historical_charts' | 'current_month'>('current_month');
+  const [showZeroConfirm, setShowZeroConfirm] = useState(false);
 
   // Available months dynamically extracted from transactions
   const availableMonths = useMemo(() => {
@@ -71,6 +78,13 @@ export const AnalyticsChartsView: React.FC<AnalyticsChartsViewProps> = ({
   }, [transactions]);
 
   const [selectedMonth, setSelectedMonth] = useState(() => availableMonths[0] || '2026-09');
+
+  // Keep selectedMonth synchronized when transactions are updated/reset
+  useEffect(() => {
+    if (availableMonths.length > 0 && !availableMonths.includes(selectedMonth)) {
+      setSelectedMonth(availableMonths[0]);
+    }
+  }, [availableMonths, selectedMonth]);
 
   // Filter transactions by selected month (YYYY-MM)
   const monthTransactions = useMemo(() => {
@@ -164,18 +178,74 @@ export const AnalyticsChartsView: React.FC<AnalyticsChartsViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {/* Reset to 0 Button */}
+          {onResetToZero && (
+            <button
+              onClick={() => setShowZeroConfirm(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 font-bold text-xs shadow-md transition active:scale-95 cursor-pointer"
+              title="Reset all charts and transactions to 0"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
+              <span>Reset to 0</span>
+            </button>
+          )}
+
+          {/* Load Demo Data Button */}
+          {onLoadDemoData && (
+            <button
+              onClick={onLoadDemoData}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 font-bold text-xs shadow-md transition active:scale-95 cursor-pointer"
+              title="Load original Excel sample figures"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+              <span>Load Sample</span>
+            </button>
+          )}
+
           {/* Bulk Upload Button */}
           <button
             onClick={onOpenBulkUpload}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition active:scale-95 cursor-pointer"
             title="Bulk Upload previous months or transactions"
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Bulk Upload Data</span>
+            <span>Bulk Upload</span>
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal for Reset to 0 */}
+      {showZeroConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-2 text-rose-400">
+              <Trash2 className="w-5 h-5" />
+              <h4 className="font-extrabold text-white text-base">Reset Charts & Ledger to 0?</h4>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              This will clear all transactions, reset all 3 long-term charts to ₹0.00, and reset bank accounts and credit cards to ₹0.
+            </p>
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
+              <button
+                onClick={() => setShowZeroConfirm(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onResetToZero?.();
+                  setShowZeroConfirm(false);
+                }}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              >
+                Yes, Reset to 0
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main View Mode Switcher */}
       <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 p-1.5 rounded-2xl">
@@ -209,6 +279,9 @@ export const AnalyticsChartsView: React.FC<AnalyticsChartsViewProps> = ({
         <HistoricalChartsView
           investments={historicalInvestments}
           expenses={historicalExpenses}
+          onOpenBulkUpload={onOpenBulkUpload}
+          onResetChartsToZero={onResetToZero}
+          onLoadDemoCharts={onLoadDemoData}
         />
       )}
 

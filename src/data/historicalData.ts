@@ -47,16 +47,59 @@ export const INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS: MonthlyExpenseVsInvestment
   { month: 'Oct-25', entertainment: 467, family: 63904, home: 35331, personalAndShopping: 42621, travel: 2537, totalExpense: 144860, investment: 15706, emi: 0, netTotal: 160566 },
 ];
 
-const STORAGE_INVESTMENT_KEY = 'fintrack_historical_investments';
-const STORAGE_EXPENSE_KEY = 'fintrack_historical_expenses';
+/**
+ * Clean Zero Slate for Investments: All 15 months set strictly to ₹0.00
+ */
+export const ZERO_INVESTMENT_SNAPSHOTS: MonthlyInvestmentSnapshot[] = [
+  'Sep-24', 'Oct-24', 'Nov-24', 'Dec-24', 'Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25',
+].map((month) => ({
+  month,
+  ppf: 0,
+  epfo: 0,
+  nps: 0,
+  equity: 0,
+  etf: 0,
+  mf: 0,
+  usEquity: 0,
+  fds: 0,
+  total: 0,
+  changePercent: 0,
+}));
 
+/**
+ * Clean Zero Slate for Expenses: All 23 months set strictly to ₹0.00
+ */
+export const ZERO_EXPENSE_SNAPSHOTS: MonthlyExpenseVsInvestmentSnapshot[] = [
+  'Dec-23', 'Jan-24', 'Feb-24', 'Mar-24', 'Apr-24', 'May-24', 'Jun-24', 'Jul-24', 'Aug-24', 'Sep-24', 'Oct-24', 'Nov-24',
+  'Dec-24', 'Jan-25', 'Feb-25', 'Mar-25', 'Apr-25', 'May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25',
+].map((month) => ({
+  month,
+  entertainment: 0,
+  family: 0,
+  home: 0,
+  personalAndShopping: 0,
+  travel: 0,
+  totalExpense: 0,
+  investment: 0,
+  emi: 0,
+  netTotal: 0,
+}));
+
+const STORAGE_INVESTMENT_KEY = 'my_finance_historical_investments_v3';
+const STORAGE_EXPENSE_KEY = 'my_finance_historical_expenses_v3';
+
+/**
+ * Loads historical investments.
+ * Defaults to ZERO_INVESTMENT_SNAPSHOTS (clean ₹0.00 state)
+ */
 export function loadHistoricalInvestments(): MonthlyInvestmentSnapshot[] {
   try {
     const raw = localStorage.getItem(STORAGE_INVESTMENT_KEY);
-    if (!raw) return INITIAL_INVESTMENT_SNAPSHOTS;
-    return JSON.parse(raw);
+    if (!raw) return ZERO_INVESTMENT_SNAPSHOTS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : ZERO_INVESTMENT_SNAPSHOTS;
   } catch (e) {
-    return INITIAL_INVESTMENT_SNAPSHOTS;
+    return ZERO_INVESTMENT_SNAPSHOTS;
   }
 }
 
@@ -68,13 +111,18 @@ export function saveHistoricalInvestments(data: MonthlyInvestmentSnapshot[]) {
   }
 }
 
+/**
+ * Loads historical expenses.
+ * Defaults to ZERO_EXPENSE_SNAPSHOTS (clean ₹0.00 state)
+ */
 export function loadHistoricalExpenses(): MonthlyExpenseVsInvestmentSnapshot[] {
   try {
     const raw = localStorage.getItem(STORAGE_EXPENSE_KEY);
-    if (!raw) return INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS;
-    return JSON.parse(raw);
+    if (!raw) return ZERO_EXPENSE_SNAPSHOTS;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : ZERO_EXPENSE_SNAPSHOTS;
   } catch (e) {
-    return INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS;
+    return ZERO_EXPENSE_SNAPSHOTS;
   }
 }
 
@@ -84,4 +132,14 @@ export function saveHistoricalExpenses(data: MonthlyExpenseVsInvestmentSnapshot[
   } catch (e) {
     console.error(e);
   }
+}
+
+export function resetHistoricalDataToZero() {
+  saveHistoricalInvestments(ZERO_INVESTMENT_SNAPSHOTS);
+  saveHistoricalExpenses(ZERO_EXPENSE_SNAPSHOTS);
+}
+
+export function loadDemoHistoricalSnapshots() {
+  saveHistoricalInvestments(INITIAL_INVESTMENT_SNAPSHOTS);
+  saveHistoricalExpenses(INITIAL_EXPENSE_VS_INVESTMENT_SNAPSHOTS);
 }

@@ -4,8 +4,12 @@ import {
   EXCEL_DEMO_FINANCE_DATA,
   INITIAL_FINANCE_DATA,
 } from '../data/initialData';
+import {
+  resetHistoricalDataToZero,
+  loadDemoHistoricalSnapshots,
+} from '../data/historicalData';
 
-const STORAGE_KEY = 'my_finance_manager_v1';
+const STORAGE_KEY = 'my_finance_manager_v2';
 
 export function loadFinanceData(): FinanceData {
   try {
@@ -49,16 +53,19 @@ export function saveFinanceData(data: FinanceData): void {
 
 export function resetToInitialData(): FinanceData {
   saveFinanceData(CLEAN_ZERO_FINANCE_DATA);
+  resetHistoricalDataToZero();
   return CLEAN_ZERO_FINANCE_DATA;
 }
 
 export function resetToZeroSlate(): FinanceData {
   saveFinanceData(CLEAN_ZERO_FINANCE_DATA);
+  resetHistoricalDataToZero();
   return CLEAN_ZERO_FINANCE_DATA;
 }
 
 export function loadDemoExcelData(): FinanceData {
   saveFinanceData(EXCEL_DEMO_FINANCE_DATA);
+  loadDemoHistoricalSnapshots();
   return EXCEL_DEMO_FINANCE_DATA;
 }
 

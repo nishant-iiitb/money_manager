@@ -60,7 +60,7 @@ export function useFinanceStore() {
   // Sync if another tab or window modifies storage
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'my_finance_manager_v1' && e.newValue) {
+      if (e.key === 'my_finance_manager_v2' && e.newValue) {
         try {
           setData(JSON.parse(e.newValue));
         } catch (err) {
